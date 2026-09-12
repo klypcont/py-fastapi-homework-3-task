@@ -36,4 +36,3 @@ def get_jwt_auth_manager():
         secret_key_refresh=settings.SECRET_KEY_REFRESH,
         algorithm=settings.JWT_SIGNING_ALGORITHM
     )
-

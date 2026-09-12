@@ -283,4 +283,3 @@ async def refresh_access_token(
     access_token = jwt_manager.create_access_token({"user_id": user.id})
 
     return TokenRefreshResponseSchema(access_token=access_token)
-
