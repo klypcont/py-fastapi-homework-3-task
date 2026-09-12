@@ -1,4 +1,4 @@
-name: CI Pipeline
+﻿name: CI Pipeline
 
 on:
   pull_request:
@@ -51,6 +51,10 @@ jobs:
       - name: Run flake8
         run: |
           poetry run flake8 src
+
+      - name: Prepare movies.csv for tests
+        run: |
+          cp src/database/seed_data/imdb_movies.csv movies.csv
 
       - name: Run movies tests
         run: |
