@@ -1,47 +1,40 @@
-import os
-
-from fastapi import Depends
-
-from config.settings import TestingSettings, Settings, BaseAppSettings
-from security.interfaces import JWTAuthManagerInterface
-from security.token_manager import JWTAuthManager
+﻿import os
+from pathlib import Path
+from pydantic_settings import BaseSettings
 
 
-def get_settings() -> BaseAppSettings:
-    """
-    Retrieve the application settings based on the current environment.
+_env_path = Path(__file__).resolve().parent.parent.parent / ".env"
+if _env_path.exists():
+    for _line in _env_path.read_text(encoding="utf-8", errors="ignore").splitlines():
+        if "=" in _line and not _line.strip().startswith("#"):
+            _k, _v = _line.split("=", 1)
+            os.environ[_k.strip()] = _v.strip().strip("'").strip('"')
 
-    This function reads the 'ENVIRONMENT' environment variable (defaulting to 'developing' if not set)
-    and returns a corresponding settings instance. If the environment is 'testing', it returns an instance
-    of TestingSettings; otherwise, it returns an instance of Settings.
 
-    Returns:
-        BaseAppSettings: The settings instance appropriate for the current environment.
-    """
-    environment = os.getenv("ENVIRONMENT", "developing")
-    if environment == "testing":
-        return TestingSettings()
+class Settings(BaseSettings):
+    SECRET_KEY_ACCESS: str
+    SECRET_KEY_REFRESH: str
+    DATABASE_URL: str
+    PATH_TO_DB: str = "database.db"
+    JWT_SIGNING_ALGORITHM: str = "HS256"
+    LOGIN_TIME_DAYS: int = 7
+    PATH_TO_MOVIES_CSV: str = "movies.csv"
+
+    class Config:
+        extra = "ignore"
+
+
+def get_settings() -> Settings:
     return Settings()
 
 
-def get_jwt_auth_manager(settings: BaseAppSettings = Depends(get_settings)) -> JWTAuthManagerInterface:
-    """
-    Create and return a JWT authentication manager instance.
-
-    This function uses the provided application settings to instantiate a JWTAuthManager, which implements
-    the JWTAuthManagerInterface. The manager is configured with secret keys for access and refresh tokens
-    as well as the JWT signing algorithm specified in the settings.
-
-    Args:
-        settings (BaseAppSettings, optional): The application settings instance.
-        Defaults to the output of get_settings().
-
-    Returns:
-        JWTAuthManagerInterface: An instance of JWTAuthManager configured with
-        the appropriate secret keys and algorithm.
-    """
+def get_jwt_auth_manager():
+    from security.token_manager import JWTAuthManager
+    settings = get_settings()
     return JWTAuthManager(
         secret_key_access=settings.SECRET_KEY_ACCESS,
         secret_key_refresh=settings.SECRET_KEY_REFRESH,
         algorithm=settings.JWT_SIGNING_ALGORITHM
     )
+
+
