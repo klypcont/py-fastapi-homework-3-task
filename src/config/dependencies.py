@@ -12,9 +12,9 @@ if _env_path.exists():
 
 
 class Settings(BaseSettings):
-    SECRET_KEY_ACCESS: str
-    SECRET_KEY_REFRESH: str
-    DATABASE_URL: str
+    SECRET_KEY_ACCESS: str = "super_access_token_key_12345"
+    SECRET_KEY_REFRESH: str = "super_refresh_token_key_12345"
+    DATABASE_URL: str = "sqlite+aiosqlite:///./database.db"
     PATH_TO_DB: str = "database.db"
     JWT_SIGNING_ALGORITHM: str = "HS256"
     LOGIN_TIME_DAYS: int = 7
