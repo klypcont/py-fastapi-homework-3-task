@@ -1,4 +1,4 @@
-﻿import asyncio
+import asyncio
 import math
 from typing import List, Dict, Tuple
 
